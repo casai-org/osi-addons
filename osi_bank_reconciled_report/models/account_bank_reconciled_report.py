@@ -11,7 +11,7 @@ class AccountBankReconciliationReport(models.AbstractModel):
     _description = "Bank Reconciled Report"
     _inherit = "account.report"
 
-    filter_date = {"date": "", "filter": "today"}
+    filter_date = {'mode': 'single', 'filter': 'today'}
 
     line_number = 0
 
@@ -61,9 +61,13 @@ class AccountBankReconciliationReport(models.AbstractModel):
         name = line.name
         line_currency = self.env.context.get("line_currency", False)
         return {
-            "id": str(line.id),
-            "caret_options": "account.bank.statement.line",
-            "model": "account.bank.statement.line",
+            "id": str(line.statement_id.id),
+            "caret_options": "account.bank.statement",
+            "move_id": str(line.move_id.id),
+            "display_move": True,
+            "move_model": "account.move",
+            "hide_bank_statement": True,
+            "model": "account.bank.statement",
             "name": len(name) >= 75 and name[0:70] + "..." or name,
             "columns": [
                 {"name": format_date(self.env, line.date), "class": "date"},
@@ -319,8 +323,7 @@ class AccountBankReconciliationReport(models.AbstractModel):
                 self._add_title_line(
                     options,
                     _(
-                        "Unreconciled Bank \
-                                           Statement Lines"
+                        "Unreconciled Bank Statement"
                     ),
                     level=2,
                 )
@@ -338,8 +341,7 @@ class AccountBankReconciliationReport(models.AbstractModel):
                 self._add_title_line(
                     options,
                     _(
-                        "Reconciled Bank \
-                                           Statement Lines"
+                        "Reconciled Bank Statement"
                     ),
                     level=2,
                 )
